@@ -1,11 +1,41 @@
 import express from "express";
+import cors from "cors";
+import { config } from "../ormconfig";
+import { createConnection } from "typeorm";
+import { Task } from "./entities/task";
+import { User } from "./entities/user";
+import { createUserRouter } from "./routes/create_user";
+import { createTaskRouter } from "./routes/create_task";
 
 const app = express();
 
-app.get("/", (req, res) => {
-  return res.send("hello world");
-});
+app.use(express.json());
+app.use(cors());
+app.use(createUserRouter);
+app.use(createTaskRouter);
 
-app.listen(8000, () => {
-  console.log("app is running");
-});
+const main = async () => {
+  try {
+    const connection = await createConnection({
+      type: "postgres",
+      host: "localhost",
+      port: 5433,
+      username: "postgres",
+      password: "895623741",
+      database: "typeorm",
+      entities: [Task, User],
+      synchronize: true,
+    });
+    console.log("connect to postgres");
+
+    app.listen(8000, () => {
+      console.log("app is running");
+    });
+
+    await connection.synchronize();
+  } catch (e) {
+    console.error("something went wrong");
+  }
+};
+
+main();
