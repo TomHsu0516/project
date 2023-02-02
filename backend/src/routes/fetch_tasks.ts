@@ -1,13 +1,14 @@
 import express from "express";
 import { Task } from "../entities/task";
 import { User } from "../entities/user";
+import { createQueryBuilder } from "typeorm";
 
 const router = express.Router();
 
-router.post("/user/:userId/task", async (req, res) => {
+router.get("/user/:userId/task", async (req, res) => {
   const { userId } = req.params;
 
-  const { name, description } = req.body;
+  console.log(userId);
 
   const user = await User.findOneBy({ id: parseInt(userId) });
 
@@ -17,15 +18,11 @@ router.post("/user/:userId/task", async (req, res) => {
     });
   }
 
-  const task = Task.create({
-    name: name,
-    description: description,
-    user: user,
-  });
+  const tasks = await createQueryBuilder("task")
+    .where({ user: user })
+    .getMany();
 
-  await task.save();
-
-  return res.json(task);
+  return res.json(tasks);
 });
 
-export { router as createTaskRouter };
+export { router as fetchTaskRouter };

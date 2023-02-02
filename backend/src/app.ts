@@ -6,6 +6,8 @@ import { Task } from "./entities/task";
 import { User } from "./entities/user";
 import { createUserRouter } from "./routes/create_user";
 import { createTaskRouter } from "./routes/create_task";
+import { fetchTaskRouter } from "./routes/fetch_tasks";
+import { fetchUserRouter } from "./routes/fetch_users";
 
 const app = express();
 
@@ -13,6 +15,8 @@ app.use(express.json());
 app.use(cors());
 app.use(createUserRouter);
 app.use(createTaskRouter);
+app.use(fetchTaskRouter);
+app.use(fetchUserRouter);
 
 const main = async () => {
   try {
