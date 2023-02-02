@@ -8,6 +8,7 @@ import { createUserRouter } from "./routes/create_user";
 import { createTaskRouter } from "./routes/create_task";
 import { fetchTaskRouter } from "./routes/fetch_tasks";
 import { fetchUserRouter } from "./routes/fetch_users";
+import { authRouter } from "./routes/auth";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(createUserRouter);
 app.use(createTaskRouter);
 app.use(fetchTaskRouter);
 app.use(fetchUserRouter);
+app.use(authRouter);
 
 const main = async () => {
   try {

@@ -1,4 +1,5 @@
 import express from "express";
+import bcrypt from "bcrypt";
 import { User } from "../entities/user";
 
 const router = express.Router();
@@ -10,10 +11,11 @@ router.get("/user", async (req, res) => {
 
 router.post("/user", async (req, res) => {
   const { email, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = User.create({
     email: email,
-    password: password, // needs to be encrypted by jwt
+    password: hashedPassword, // needs to be encrypted by jwt
   });
 
   await user.save();
