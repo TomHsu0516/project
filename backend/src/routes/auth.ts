@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import fs from "fs";
 import { User } from "../entities/user";
 
 const router = express.Router();
@@ -27,11 +28,8 @@ router.post("/login", async (req, res) => {
   }
 
   const token = jwt.sign(
-    {
-      userId: user.id,
-      userEmail: user.email,
-    },
-    "RANDOM-TOKEN",
+    { email: user.email, password: user.password },
+    "sss",
     { expiresIn: "24h" }
   );
 
