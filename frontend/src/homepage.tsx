@@ -1,13 +1,58 @@
-import React, { FC, useState, ChangeEvent } from "react";
+import React, { FC, useState, ChangeEvent, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
 import { Task } from "./interfaces";
 import TodoTask from "./components/TodoTask/TodoTask";
+import { UserContext } from "./userContext";
+
+interface LocalUser {
+  id: string;
+  email: string;
+  token: string;
+}
 
 const HomePage: FC = () => {
   const [taskName, setTaskName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [todoList, setTodoList] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const { user, setUser } = useContext(UserContext);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let localUser: LocalUser = JSON.parse(localStorage.getItem("user") || "{}");
+    console.log(localUser);
+    let id: string;
+
+    if (localUser) {
+      setUser(localUser);
+      id = localUser.id;
+
+      const fetchAPI = async () => {
+        let response = await fetch(`http://localhost:8000/user/${id}/task`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localUser.token,
+          },
+        });
+
+        if (response.status === 200) {
+          const userTasks = await response.json();
+          setTasks(userTasks);
+        } else {
+          setErrorMessage(response.statusText);
+          setTimeout(() => {
+            navigate("/login");
+          }, 2000);
+        }
+      };
+
+      fetchAPI();
+    }
+  }, []);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const name = event.target.name;
@@ -25,9 +70,9 @@ const HomePage: FC = () => {
       return;
     }
     const newTask = { name: taskName, description: description };
-    setTodoList([...todoList, newTask]);
+    setTasks([...tasks, newTask]);
 
-    await fetch("http://localhost:8000/newTask", {
+    await fetch(`http://localhost:8000/user/${user.id}/task`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -36,8 +81,17 @@ const HomePage: FC = () => {
     });
   };
 
-  return (
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/login");
+  };
+
+  return errorMessage ? (
+    <div>{errorMessage}</div>
+  ) : (
     <div className="App">
+      <button onClick={handleLogout}>Log Out</button>
       <div className="header">
         <h1>TODO List App</h1>
       </div>
@@ -57,7 +111,7 @@ const HomePage: FC = () => {
       </div>
       <button onClick={addTask}>Add</button>
       <div className="todoList">
-        {todoList.map((task: Task, key: number) => {
+        {tasks.map((task: Task, key: number) => {
           return <TodoTask key={key} task={task} />;
         })}
       </div>
