@@ -11,14 +11,22 @@ router.get("/user", async (req, res) => {
 
 router.post("/user", async (req, res) => {
   const { email, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
+  let user = await User.findOneBy({ email });
 
-  const user = User.create({
-    email: email,
-    password: hashedPassword, // needs to be encrypted by jwt
-  });
+  if (user) {
+    return res.status(409).send({
+      message: "User already exists",
+    });
+  } else {
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  await user.save();
+    user = User.create({
+      email: email,
+      password: hashedPassword, // needs to be encrypted by jwt
+    });
+
+    await user.save();
+  }
 
   return res.json(user);
 });

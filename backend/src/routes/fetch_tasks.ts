@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/user/:userId/task", authenticate, async (req, res) => {
   const { userId } = req.params;
 
-  console.log(userId);
+  // console.log(userId);
 
   const user = await User.findOneBy({ id: parseInt(userId) });
 

@@ -11,7 +11,7 @@ router.post("/login", async (req, res) => {
   console.log(email);
 
   const user = await User.findOneBy({ email: email });
-  console.log(user);
+  console.log("backend user searching result", user);
 
   if (!user) {
     return res.status(404).send({
@@ -35,6 +35,7 @@ router.post("/login", async (req, res) => {
 
   return res.status(200).send({
     message: "Login Successful",
+    id: user.id,
     email: user.email,
     token,
   });

@@ -14,7 +14,10 @@ export const authenticate = async (
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
 
-    if (!token) return res.sendStatus(401);
+    if (!token)
+      return res.status(401).send({
+        message: "401 Unauthorized",
+      });
 
     //check if the token matches the supposed origin
     const decodedToken = await jwt.verify(token, "sss");
@@ -28,8 +31,8 @@ export const authenticate = async (
     // pass down functionality to the endpoint
     next();
   } catch (error) {
-    res.status(401).json({
-      error: new Error("Invalid request!"),
+    res.status(401).send({
+      message: "401 Unauthorized",
     });
   }
 };
