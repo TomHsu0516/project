@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/user/:userId/task", async (req, res) => {
   const { userId } = req.params;
 
-  const { name, description } = req.body;
+  const { id, name, description } = req.body;
 
   const user = await User.findOneBy({ id: parseInt(userId) });
 
@@ -18,6 +18,7 @@ router.post("/user/:userId/task", async (req, res) => {
   }
 
   const task = Task.create({
+    id: id,
     name: name,
     description: description,
     user: user,
