@@ -1,13 +1,27 @@
 import React, { FC, useState, ChangeEvent } from "react";
-import { Task } from "../../interfaces";
+import { LocalUser, Task } from "../../interfaces";
 import "./TodoTask.css";
 
 interface Props {
   task: Task;
+  updateTasksAfterDeletion(taskId: string): void;
 }
 
-const TodoTask = ({ task }: Props) => {
-  const handleDelete = () => {
+const TodoTask = ({ task, updateTasksAfterDeletion }: Props) => {
+  const handleDelete = async (taskId: string) => {
+    let localUser: LocalUser = JSON.parse(localStorage.getItem("user") || "{}");
+    if (localUser) {
+      const response = await fetch(`http://localhost:8000/task/${task.id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localUser.token,
+        },
+      });
+      const deletedTask = await response.json();
+      console.log("deleted task", deletedTask);
+    }
+    updateTasksAfterDeletion(taskId);
     console.log("delete");
   };
 
@@ -17,7 +31,7 @@ const TodoTask = ({ task }: Props) => {
         <span>{task.name}</span>
         <span>{task.description}</span>
       </div>
-      <button onClick={handleDelete}>Delete</button>
+      <button onClick={() => handleDelete(task.id)}>Delete</button>
     </div>
   );
 };

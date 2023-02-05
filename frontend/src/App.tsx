@@ -1,32 +1,20 @@
-import React, { FC, useContext, useState } from "react";
+import React, { FC, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "./homepage";
 import Login from "./login";
 import Register from "./register";
-import { UserContext } from "./userContext";
+import { Task } from "./interfaces";
+// import { Context } from "./context";
 
 const App: FC = () => {
-  const [user, setUser] = useState({});
   return (
+    // <Context.Provider value={}>
     <Routes>
-      <Route
-        path="homepage"
-        element={
-          <UserContext.Provider value={{ user, setUser }}>
-            <HomePage />
-          </UserContext.Provider>
-        }
-      />
-      <Route
-        path="login"
-        element={
-          <UserContext.Provider value={{ user, setUser }}>
-            <Login />
-          </UserContext.Provider>
-        }
-      />
+      <Route path="homepage" element={<HomePage />} />
+      <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
     </Routes>
+    // </Context.Provider>
   );
 };
 

@@ -3,14 +3,11 @@ import { useNavigate } from "react-router-dom";
 
 import "./App.css";
 
-import { UserContext } from "./userContext";
-
 const Login: FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const { user, setUser } = useContext(UserContext);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const name = event.target.name;
@@ -41,7 +38,6 @@ const Login: FC = () => {
     const result = await response.json();
 
     if (response.status === 200) {
-      setUser(result);
       localStorage.setItem("user", JSON.stringify(result));
       setEmail("");
       setPassword("");

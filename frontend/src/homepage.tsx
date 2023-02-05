@@ -2,32 +2,23 @@ import React, { FC, useState, ChangeEvent, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
-import { Task } from "./interfaces";
+import { LocalUser, Task } from "./interfaces";
 import TodoTask from "./components/TodoTask/TodoTask";
-import { UserContext } from "./userContext";
-
-interface LocalUser {
-  id: string;
-  email: string;
-  token: string;
-}
 
 const HomePage: FC = () => {
   const [taskName, setTaskName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [tasks, setTasks] = useState<Task[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const { user, setUser } = useContext(UserContext);
 
   const navigate = useNavigate();
+  const localUser: LocalUser = JSON.parse(localStorage.getItem("user") || "{}");
 
   useEffect(() => {
-    let localUser: LocalUser = JSON.parse(localStorage.getItem("user") || "{}");
     console.log(localUser);
     let id: string;
 
     if (localUser) {
-      setUser(localUser);
       id = localUser.id;
 
       const fetchAPI = async () => {
@@ -65,25 +56,39 @@ const HomePage: FC = () => {
   };
 
   const addTask = async () => {
+    let localUser: LocalUser = JSON.parse(localStorage.getItem("user") || "{}");
     if (!taskName || !description) {
       window.alert("you cannot add a task with an empty name/description");
       return;
     }
-    const newTask = { name: taskName, description: description };
+    const id = (tasks.length + 1).toString();
+    const newTask = { id: id, name: taskName, description: description };
     setTasks([...tasks, newTask]);
+    if (localUser) {
+      await fetch(`http://localhost:8000/user/${localUser.id}/task`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newTask),
+      });
+    }
 
-    await fetch(`http://localhost:8000/user/${user.id}/task`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newTask),
-    });
+    setTaskName("");
+    setDescription("");
+  };
+
+  const updateTasksAfterDeletion = (taskId: string): void => {
+    setTasks(
+      tasks.filter((task) => {
+        return task.id !== taskId;
+      })
+    );
   };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    setUser(null);
+
     navigate("/login");
   };
 
@@ -100,19 +105,27 @@ const HomePage: FC = () => {
           type="text"
           placeholder="Task"
           name="task"
+          value={taskName}
           onChange={handleChange}
         />
         <input
           type="text"
           placeholder="Description"
           name="description"
+          value={description}
           onChange={handleChange}
         />
       </div>
       <button onClick={addTask}>Add</button>
       <div className="todoList">
         {tasks.map((task: Task, key: number) => {
-          return <TodoTask key={key} task={task} />;
+          return (
+            <TodoTask
+              key={key}
+              task={task}
+              updateTasksAfterDeletion={updateTasksAfterDeletion}
+            />
+          );
         })}
       </div>
     </div>
