@@ -10,7 +10,9 @@ router.get("/user", async (req, res) => {
 });
 
 router.post("/user", async (req, res) => {
+  console.log(req.body);
   const { email, password } = req.body;
+  console.log(email, password);
   let user = await User.findOneBy({ email });
 
   if (user) {
@@ -22,7 +24,7 @@ router.post("/user", async (req, res) => {
 
     user = User.create({
       email: email,
-      password: hashedPassword, // needs to be encrypted by jwt
+      password: hashedPassword,
     });
 
     await user.save();
