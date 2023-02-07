@@ -2,7 +2,7 @@ import React, { FC, useState, ChangeEvent, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
-import { LocalUser, Task } from "./interfaces";
+import { LocalUser, Task, UpdatedTask } from "./interfaces";
 import TodoTask from "./components/TodoTask/TodoTask";
 
 const HomePage: FC = () => {
@@ -86,6 +86,22 @@ const HomePage: FC = () => {
     );
   };
 
+  const updateTasksAfterEditing = async (updatedTask: UpdatedTask) => {
+    let response = await fetch(
+      `http://localhost:8000/user/${localUser.id}/task`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localUser.token,
+        },
+      }
+    );
+
+    const userTasks = await response.json();
+    setTasks(userTasks);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("user");
 
@@ -124,6 +140,7 @@ const HomePage: FC = () => {
               key={key}
               task={task}
               updateTasksAfterDeletion={updateTasksAfterDeletion}
+              updateTasksAfterEditing={updateTasksAfterEditing}
             />
           );
         })}

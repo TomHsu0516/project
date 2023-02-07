@@ -15,3 +15,8 @@ export interface LocalUser {
   email: string;
   token: string;
 }
+
+export interface UpdatedTask {
+  name: string;
+  description: string;
+}
