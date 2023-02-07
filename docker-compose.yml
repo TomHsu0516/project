@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: 895623741
+      POSTGRES_USER: postgres
+      POSTGRES_DB: typeorm
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    container_name: backend_c
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: frontend_c
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    stdin_open: true
+    tty: true
