@@ -26,7 +26,7 @@ const main = async () => {
   try {
     const connection = await createConnection({
       type: "postgres",
-      host: "localhost",
+      host: "host.docker.internal", // host.docker.internal, localhost
       port: 5432,
       username: "postgres",
       password: "895623741",
@@ -42,7 +42,10 @@ const main = async () => {
 
     await connection.synchronize();
   } catch (e) {
+    // console.log(e);
     console.error("something went wrong");
+    // retries--;
+    // await new Promise((res) => setTimeout(res, 5000));
   }
 };
 
