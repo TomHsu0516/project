@@ -10,6 +10,7 @@ import { fetchTaskRouter } from "./routes/fetch_tasks";
 import { fetchUserRouter } from "./routes/fetch_users";
 import { authRouter } from "./routes/auth";
 import { deleteTaskRouter } from "./routes/delete_task";
+import { updateTaskRouter } from "./routes/update_task";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(createTaskRouter);
 app.use(fetchTaskRouter);
 app.use(fetchUserRouter);
 app.use(deleteTaskRouter);
+app.use(updateTaskRouter);
 app.use(authRouter);
 
 const main = async () => {
