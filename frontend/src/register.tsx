@@ -25,8 +25,12 @@ const Register: FC = () => {
       email: email,
       password: password,
     };
+    console.log(newUser);
     const response = await fetch("http://localhost:8000/user", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(newUser),
     });
 
